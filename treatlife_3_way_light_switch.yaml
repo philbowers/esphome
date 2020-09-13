@@ -11,8 +11,8 @@
 
 substitutions:
   # https://esphome.io/guides/configuration-types.html#substitutions
-  device_name: basement_light_stairs
-  friendly_name: Basement light stairs
+  device_name: treatlife_3_way_light_switch
+  friendly_name: Treatlife 3 Way Light Switch
   icon: "mdi:light-switch"
   
 esphome:
