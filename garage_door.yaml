@@ -1,0 +1,94 @@
+# #############################
+# Relay and sht3x Temp Sensor
+# #############################
+# D2 GPIO04: sda
+# D1 GPIO05: scl
+# D7 GPIO13: binary sensor
+# D5 GPIO14: relay
+# D4 GPIO2:  led
+# #############################
+
+substitutions:
+  device_name: garage_door
+  friendly_name: Garage door
+  icon: "mdi:garage"
+
+esphome:
+  name: ${device_name}
+  platform: ESP8266
+  board: d1_mini_lite
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  ap:
+    ssid: ${device_name}
+    password: !secret esphome_ap_password
+
+captive_portal:
+
+logger:
+
+api:
+  password: !secret esphome_api_password
+
+ota:
+  password: !secret esphome_ota_password
+
+binary_sensor:
+- platform: gpio
+  pin:
+    number: GPIO13
+    mode: INPUT_PULLUP
+    inverted: False
+  name: ${friendly_name}
+  id: ${device_name}_sensor
+  device_class: ${device_name}
+  filters:
+    - delayed_on: 20ms
+
+i2c:
+  sda: GPIO4
+  scl: GPIO5
+  id: bus_a
+  scan: true
+
+sensor:
+- platform: sht3xd
+  i2c_id: bus_a
+  address: 0x44
+  temperature:
+    name: "Garage Temperature"
+    id: temperature_sensor
+    filters:
+    - lambda: return x * (9.0/5.0) + 32.0;
+    unit_of_measurement: "°F"
+  humidity:
+    name: "Garage Humidity"
+    id: humidity_sensor
+  update_interval: 60s
+
+switch:
+- platform: gpio
+  id: ${device_name}_switch
+  pin:
+    number: GPIO14
+    inverted: False
+  restore_mode: ALWAYS_OFF
+  
+- platform: template
+  name: ${friendly_name}
+  icon: ${icon}
+  turn_on_action:
+  - switch.turn_on: ${device_name}_switch
+  - delay: 0.5s
+  - switch.turn_off: ${device_name}_switch
+  
+- platform: restart
+  name: 'Garage Door REBOOT'
+  
+status_led:
+  id: led_status
+  pin:
+    number: GPIO2
