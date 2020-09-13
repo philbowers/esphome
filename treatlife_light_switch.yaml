@@ -10,8 +10,8 @@
 
 substitutions:
   # https://esphome.io/guides/configuration-types.html#substitutions
-  device_name: basement_light_zone_1
-  friendly_name: Basement light zone 1
+  device_name: treatlife_light_switch
+  friendly_name: Treatlife Light Switch
   icon: "mdi:light-switch"
 
 esphome:
@@ -29,10 +29,8 @@ wifi:
   
 captive_portal:
 
-# Enable logging
 logger:
 
-# Enable Home Assistant API
 api:
   password: !secret esphome_api_password
   
@@ -40,7 +38,6 @@ ota:
   password: !secret esphome_ota_password
 
 status_led:
-  # https://esphome.io/components/status_led
   pin:
     number: GPIO05   # Red LED
     inverted: True
@@ -124,7 +121,6 @@ switch:
     restore_mode: RESTORE_DEFAULT_OFF
 
   - platform: template
-    # https://esphome.io/components/switch/template.html
     name: ${friendly_name}
     id: ${device_name}
     icon: ${icon}
