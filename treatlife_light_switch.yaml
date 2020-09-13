@@ -1,0 +1,142 @@
+# ##################################
+# Treatlife Light Switch
+# ##################################
+# D2 GPIO04: white led (inverted) (sensor)
+# D1 GPIO05: red led (inverted)
+# D6 GPIO12: relay
+# D7 GPIO13: button (inverted)
+# ##################################
+
+
+substitutions:
+  # https://esphome.io/guides/configuration-types.html#substitutions
+  device_name: basement_light_zone_1
+  friendly_name: Basement light zone 1
+  icon: "mdi:light-switch"
+
+esphome:
+  name: ${device_name}
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  
+  ap:
+    ssid: ${device_name}
+    password: !secret esphome_ap_password
+  
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret esphome_api_password
+  
+ota:
+  password: !secret esphome_ota_password
+
+status_led:
+  # https://esphome.io/components/status_led
+  pin:
+    number: GPIO05   # Red LED
+    inverted: True
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO4
+      inverted: True
+    id: sensor
+    internal: True
+
+  - platform: gpio
+    pin:
+      number: GPIO13
+      inverted: True
+    id: button
+    name: ${friendly_name} Button
+    on_multi_click:
+   # Single Click:
+    - timing:
+      - ON for at most 1s
+      - OFF for at least 0.3s
+      then:
+        - switch.toggle: ${device_name}
+        - logger.log: "Single Short Clicked"
+        - homeassistant.event:
+            event: esphome.${device_name}
+            data:
+              title: single_click 
+   # Double Click:
+    - timing:
+      - ON for at most 1s
+      - OFF for at most 1s
+      - ON for at most 1s
+      - OFF for at least 0.2s
+      then:
+        - logger.log: "Double Clicked"
+        - homeassistant.event:
+            event: esphome.${device_name}
+            data:
+              title: double_click
+    # Long Click:
+    - timing:
+      - ON for 1s to 2s
+      - OFF for at least 0.3s
+      then:
+        - logger.log: "Single Long Clicked"
+        - homeassistant.event:
+            event: esphome.${device_name}
+            data:
+              title: long_click
+    - timing:
+      - ON for at least 2.2s
+      then:
+        - logger.log: "Click and Hold"
+        - homeassistant.event:
+            event: esphome.${device_name}
+            data:
+              title: hold
+    internal: True
+    
+light:
+  - platform: binary
+    id: white_led
+    output: led_1
+    restore_mode: RESTORE_DEFAULT_ON
+    internal: True
+    
+output:
+  - platform: gpio
+    id: led_1
+    pin:
+      number: GPIO4
+      inverted: True
+
+switch:
+  - platform: gpio
+    pin: GPIO12
+    id: relay
+    restore_mode: RESTORE_DEFAULT_OFF
+
+  - platform: template
+    # https://esphome.io/components/switch/template.html
+    name: ${friendly_name}
+    id: ${device_name}
+    icon: ${icon}
+    lambda: |-
+      if (id(sensor).state) {
+        return false;
+      } else {
+        return true;
+      }
+    turn_on_action:
+      - switch.turn_on: relay
+      - light.turn_off: white_led
+    turn_off_action:
+      - switch.turn_off: relay
+      - light.turn_on: white_led
