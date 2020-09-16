@@ -109,19 +109,32 @@ binary_sensor:
               title: hold
     internal: True
     
+light:
+  - platform: binary
+    id: white_led
+    output: led_1
+    restore_mode: RESTORE_DEFAULT_ON
+    internal: True
+    
+output:
+  - platform: gpio
+    id: led_1
+    pin:
+      number: GPIO4
+      inverted: True
+
 switch:
+  - platform: gpio
+    id: red_led
+    pin:
+      number: GPIO5
+      inverted: True
+    internal: True
+    
   - platform: gpio
     pin: GPIO12
     id: relay
     restore_mode: RESTORE_DEFAULT_OFF
-    internal: True
-    
-  - platform: gpio
-    id: white_led
-    pin:
-      number: GPIO4
-      inverted: True
-    restore_mode: RESTORE_DEFAULT_ON
     internal: True
   
   - platform: template
