@@ -131,8 +131,16 @@ switch:
         return true;
       }
     turn_on_action:
-      - switch.turn_on: relay
-      - light.turn_off: white_led
-    turn_off_action:
-      - switch.turn_off: relay
-      - light.turn_on: white_led
+        - if:
+            condition:
+              binary_sensor.is_on: sensor
+            then:
+              - switch.turn_on: relay
+              - light.toggle: white_led
+    turn_off_action:        
+        - if:
+            condition:
+              binary_sensor.is_off: sensor
+            then:
+              - switch.turn_off: relay
+              - light.toggle: white_led
