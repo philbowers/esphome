@@ -55,9 +55,9 @@ binary_sensor:
     filters:
       - delayed_off: 50ms
     on_press:
-      - switch.toggle: white_led
+      - light.turn_off: white_led
     on_release:
-      - switch.toggle: white_led
+      - light.turn_on: white_led
     internal: True
 
   - platform: gpio
