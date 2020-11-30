@@ -13,7 +13,7 @@ substitutions:
   device_name: treatlife_3_way_light_switch
   friendly_name: Treatlife 3 Way Light Switch
   icon: "mdi:light-switch"
-  
+
 esphome:
   name: ${device_name}
   platform: ESP8266
@@ -25,14 +25,14 @@ wifi:
   ap:
     ssid: ${device_name}
     password: !secret esphome_ap_password
-  
+
 captive_portal:
 
 logger:
 
 api:
   password: !secret esphome_api_password
-  
+
 ota:
   password: !secret esphome_ota_password
 
@@ -110,7 +110,7 @@ light:
   output: led_1
   restore_mode: RESTORE_DEFAULT_ON
   internal: True
-    
+ 
 output:
 - platform: gpio
   id: led_1
@@ -134,7 +134,7 @@ switch:
   id: relay
   restore_mode: RESTORE_DEFAULT_OFF
   internal: True
-  
+
 - platform: template
   name: ${friendly_name}
   id: ${device_name}
